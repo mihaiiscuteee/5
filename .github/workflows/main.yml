@@ -1,0 +1,22 @@
+name: Auto Repo Creator
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"  # Exécuter toutes les 12 heures
+  workflow_dispatch:  # Permet de lancer manuellement
+
+jobs:
+  create_repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create a new repository
+        run: |
+          REPO_NAME="auto-repo-$(date +%Y%m%d%H%M%S)"
+          DESCRIPTION="Repo créé automatiquement le $(date)"
+          
+          curl -X POST -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user/repos \
+               -d "{\"name\":\"$REPO_NAME\",\"description\":\"$DESCRIPTION\",\"private\":false}"
+
+          echo "✅ Repository $REPO_NAME créé avec succès !"
